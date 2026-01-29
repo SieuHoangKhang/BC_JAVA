@@ -405,8 +405,8 @@ public class FormQuanLySanPham extends JFrame {
         // Check VIEW permission
         if (!PermissionService.canView(role, "PRODUCT")) {
             javax.swing.JOptionPane.showMessageDialog(this,
-                "BẠN KHÔNG CÓ QUYỀN TRUY CẪP CHỨC NĂNG NÀY!",
-                "Từ chối truy cập",
+                "BAN KHONG CO QUYEN TRUY CAP CHUC NANG NAY!",
+                "Tu choi truy cap",
                 javax.swing.JOptionPane.ERROR_MESSAGE);
             dispose();
             return;
@@ -415,17 +415,17 @@ public class FormQuanLySanPham extends JFrame {
         // Disable buttons based on permissions
         if (!PermissionService.canCreate(role, "PRODUCT")) {
             btnAdd.setEnabled(false);
-            btnAdd.setToolTipText("Bạn không có quyền thêm sản phẩm");
+            btnAdd.setToolTipText("Ban khong co quyen them san pham");
         }
         
         if (!PermissionService.canUpdate(role, "PRODUCT")) {
             btnEdit.setEnabled(false);
-            btnEdit.setToolTipText("Bạn không có quyền sửa sản phẩm");
+            btnEdit.setToolTipText("Ban khong co quyen sua san pham");
         }
         
         if (!PermissionService.canDelete(role, "PRODUCT")) {
             btnDelete.setEnabled(false);
-            btnDelete.setToolTipText("Bạn không có quyền xóa sản phẩm");
+            btnDelete.setToolTipText("Ban khong co quyen xoa san pham");
         }
     }
     

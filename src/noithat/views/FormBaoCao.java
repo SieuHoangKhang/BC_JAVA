@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
+import java.io.*;
 
 public class FormBaoCao extends JFrame {
     private JTable tableReport;
@@ -17,6 +18,7 @@ public class FormBaoCao extends JFrame {
     public FormBaoCao() {
         initComponents();
         loadData();
+        applyPermissions();
     }
     
     private void initComponents() {
@@ -73,9 +75,9 @@ public class FormBaoCao extends JFrame {
         btnRefresh.setPreferredSize(new Dimension(120, 40));
         btnRefresh.addActionListener(e -> loadData());
         
-        btnExport = new ModernButton("📊 Xuất Excel", ColorTheme.INFO);
-        btnExport.setPreferredSize(new Dimension(130, 40));
-        btnExport.addActionListener(e -> ToastNotification.show(this, "Chức năng xuất Excel đang phát triển!", ToastNotification.INFO));
+        btnExport = new ModernButton("📊 Xuất Excel/CSV", ColorTheme.INFO);
+        btnExport.setPreferredSize(new Dimension(150, 40));
+        btnExport.addActionListener(e -> exportToCSV());
         
         controlPanel.add(lblReportType);
         controlPanel.add(cmbReportType);
@@ -152,7 +154,7 @@ public class FormBaoCao extends JFrame {
             while (rs.next()) {
                 tableModel.addRow(new Object[]{
                     count++,
-                    rs.getDate("OrderDate"),
+                    rs.getDate("OrderDate") + " - " + rs.getString("CustomerName"),
                     CurrencyHelper.formatCurrency(rs.getDouble("TotalAmount"))
                 });
             }
@@ -161,7 +163,7 @@ public class FormBaoCao extends JFrame {
     }
     
     private void loadTopProductsReport() throws SQLException {
-        String sql = "SELECT TOP 10 p.ProductName, SUM(od.Quantity) AS TotalQty, SUM(od.Quantity * od.Price) AS Revenue " +
+        String sql = "SELECT TOP 10 p.ProductName, SUM(od.Quantity) AS TotalQty, SUM(od.Quantity * od.UnitPrice) AS Revenue " +
                      "FROM OrderDetails od JOIN Products p ON od.ProductID = p.ProductID " +
                      "GROUP BY p.ProductName ORDER BY TotalQty DESC";
         
@@ -173,7 +175,7 @@ public class FormBaoCao extends JFrame {
             while (rs.next()) {
                 tableModel.addRow(new Object[]{
                     count++,
-                    rs.getString("ProductName") + " (" + rs.getInt("TotalQty") + " cái)",
+                    rs.getString("ProductName") + " (Đã bán: " + rs.getInt("TotalQty") + " cái)",
                     CurrencyHelper.formatCurrency(rs.getDouble("Revenue"))
                 });
             }
@@ -182,7 +184,7 @@ public class FormBaoCao extends JFrame {
     }
     
     private void loadTopCustomersReport() throws SQLException {
-        String sql = "SELECT TOP 10 c.CustomerName, COUNT(o.OrderID) AS OrderCount, SUM(o.TotalAmount) AS TotalSpent " +
+        String sql = "SELECT TOP 10 c.CustomerName, COUNT(o.OrderID) AS OrderCount, ISNULL(SUM(o.TotalAmount), 0) AS TotalSpent " +
                      "FROM Customers c LEFT JOIN Orders o ON c.CustomerID = o.CustomerID " +
                      "GROUP BY c.CustomerID, c.CustomerName ORDER BY TotalSpent DESC";
         
@@ -203,9 +205,9 @@ public class FormBaoCao extends JFrame {
     }
     
     private void loadInventoryReport() throws SQLException {
-        String sql = "SELECT TOP 15 p.ProductName, i.Quantity, p.Price FROM Inventory i " +
-                     "JOIN Products p ON i.ProductID = p.ProductID " +
-                     "ORDER BY i.Quantity DESC";
+        String sql = "SELECT TOP 15 p.ProductName, p.Stock, p.Price FROM Products p " +
+                     "WHERE p.IsActive = 1 " +
+                     "ORDER BY p.Stock DESC";
         
         try (Connection conn = DatabaseHelper.getDBConnection();
              Statement stmt = conn.createStatement();
@@ -213,16 +215,92 @@ public class FormBaoCao extends JFrame {
             
             int count = 1;
             while (rs.next()) {
-                int qty = rs.getInt("Quantity");
-                String status = qty > 10 ? "Đủ" : qty > 0 ? "Sắp hết" : "Hết hàng";
+                int stock = rs.getInt("Stock");
+                String status = stock > 10 ? "Còn nhiều" : stock > 0 ? "Còn hàng" : "Hết hàng";
                 tableModel.addRow(new Object[]{
                     count++,
                     rs.getString("ProductName") + " (" + status + ")",
-                    qty + " cái"
+                    stock + " cái - " + CurrencyHelper.formatCurrency(rs.getDouble("Price"))
                 });
             }
             lblStatus.setText("Tổng: " + (count - 1) + " sản phẩm");
         }
     }
+    
+    private void exportToCSV() {
+        if (tableModel.getRowCount() == 0) {
+            ToastNotification.show(this, "Không có dữ liệu để xuất!", ToastNotification.WARNING);
+            return;
+        }
+        
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Lưu báo cáo");
+        fileChooser.setSelectedFile(new java.io.File(((String) cmbReportType.getSelectedItem()) + ".csv"));
+        
+        int userSelection = fileChooser.showSaveDialog(this);
+        
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            java.io.File fileToSave = fileChooser.getSelectedFile();
+            String filePath = fileToSave.getAbsolutePath();
+            if (!filePath.toLowerCase().endsWith(".csv")) {
+                filePath += ".csv";
+            }
+            
+            try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+                // Write header
+                String reportType = (String) cmbReportType.getSelectedItem();
+                writer.println("BÁO CÁO: " + reportType);
+                writer.println("Ngày xuất: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date()));
+                writer.println("");
+                
+                // Write column headers
+                writer.println("STT,Dữ Liệu,Giá Trị");
+                
+                // Write data
+                for (int i = 0; i < tableModel.getRowCount(); i++) {
+                    StringBuilder row = new StringBuilder();
+                    for (int j = 0; j < tableModel.getColumnCount(); j++) {
+                        Object value = tableModel.getValueAt(i, j);
+                        if (value != null) {
+                            String cell = value.toString().replace("\"", "\"\"");
+                            row.append("\"").append(cell).append("\"");
+                        } else {
+                            row.append("\"\"");
+                        }
+                        if (j < tableModel.getColumnCount() - 1) {
+                            row.append(",");
+                        }
+                    }
+                    writer.println(row.toString());
+                }
+                
+                writer.println("");
+                writer.println("Tổng số bản ghi: " + tableModel.getRowCount());
+                
+                ToastNotification.show(this, "✅ Xuất file thành công!\n" + filePath, ToastNotification.SUCCESS);
+                
+            } catch (IOException e) {
+                ToastNotification.show(this, "Lỗi xuất file: " + e.getMessage(), ToastNotification.ERROR);
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private void applyPermissions() {
+        String role = SessionManager.getInstance().getRole();
+        
+        if (!PermissionService.canView(role, "REPORT")) {
+            JOptionPane.showMessageDialog(this,
+                "BAN KHONG CO QUYEN TRUY CAP CHUC NANG NAY!",
+                "Tu choi truy cap",
+                JOptionPane.ERROR_MESSAGE);
+            dispose();
+            return;
+        }
+        
+        if (!PermissionService.canExport(role, "REPORT")) {
+            btnExport.setEnabled(false);
+            btnExport.setToolTipText("Ban khong co quyen xuat bao cao");
+        }
+    }
 }
-

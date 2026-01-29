@@ -10,6 +10,7 @@ public class ToastNotification extends JWindow {
     public static final int WARNING = 3;
     public static final int ERROR = 4;
     
+    @SuppressWarnings("unused")
     private final int duration;
     
     public ToastNotification(Window owner, String message, int type, int duration) {

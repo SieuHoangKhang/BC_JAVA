@@ -439,4 +439,29 @@ public class FormQuanLyKho extends JFrame {
         buttonBar.add(btnSave);
         return buttonBar;
     }
+
+    private void applyPermissions() {
+        String role = SessionManager.getInstance().getRole();
+
+        if (!PermissionService.canView(role, "INVENTORY")) {
+            JOptionPane.showMessageDialog(this,
+                "BAN KHONG CO QUYEN TRUY CAP CHUC NANG NAY!",
+                "Tu choi truy cap",
+                JOptionPane.ERROR_MESSAGE);
+            dispose();
+            return;
+        }
+
+        if (!PermissionService.canCreate(role, "INVENTORY")) {
+            btnImport.setEnabled(false);
+            btnImport.setToolTipText("Ban khong co quyen nhap kho");
+            btnExport.setEnabled(false);
+            btnExport.setToolTipText("Ban khong co quyen xuat kho");
+        }
+
+        if (!PermissionService.canDelete(role, "INVENTORY")) {
+            btnDelete.setEnabled(false);
+            btnDelete.setToolTipText("Ban khong co quyen xoa giao dich");
+        }
+    }
 }

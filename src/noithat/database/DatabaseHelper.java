@@ -17,7 +17,9 @@ public class DatabaseHelper {
         "user=" + USERNAME + ";" +
         "password=" + PASSWORD + ";" +
         "encrypt=false;" +
-        "trustServerCertificate=true;";
+        "trustServerCertificate=true;" +
+        "characterEncoding=UTF-8;" +
+        "sendStringParametersAsUnicode=true";
     
     /**
      * Tạo kết nối database mới

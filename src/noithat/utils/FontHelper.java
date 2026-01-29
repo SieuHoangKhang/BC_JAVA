@@ -1,74 +1,287 @@
 package noithat.utils;
 
-import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
+import java.awt.Font;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Font management system with premium typography
+ * Professional Typography System
+ * Modern fonts for enterprise applications
  */
 public class FontHelper {
-    // Heading fonts
-    public static final Font HEADING_EXTRA_LARGE = new Font("Segoe UI", Font.BOLD, 32);
-    public static final Font HEADING_LARGE = new Font("Segoe UI", Font.BOLD, 28);
-    public static final Font HEADING_MEDIUM = new Font("Segoe UI", Font.BOLD, 24);
-    public static final Font HEADING_SMALL = new Font("Segoe UI", Font.BOLD, 20);
     
-    // Body fonts
-    public static final Font BODY_LARGE = new Font("Segoe UI", Font.PLAIN, 16);
-    public static final Font BODY_MEDIUM = new Font("Segoe UI", Font.PLAIN, 14);
-    public static final Font BODY_SMALL = new Font("Segoe UI", Font.PLAIN, 13);
-    public static final Font BODY_TINY = new Font("Segoe UI", Font.PLAIN, 11);
+    // ============================================
+    // FONT NAMES
+    // ============================================
+    public static final String FONT_SANS_SERIF = "Segoe UI";
+    public static final String FONT_MONOSPACE = "Consolas";
     
-    // Special fonts
-    public static final Font BUTTON = new Font("Segoe UI", Font.BOLD, 13);
-    public static final Font LABEL = new Font("Segoe UI", Font.PLAIN, 12);
-    public static final Font CAPTION = new Font("Segoe UI", Font.PLAIN, 11);
-    public static final Font MONO = new Font("Consolas", Font.PLAIN, 12);
+    // ============================================
+    // FONT SIZES
+    // ============================================
+    public static final int SIZE_DISPLAY = 48;  // Hero titles
+    public static final int SIZE_H1 = 36;       // Page titles
+    public static final int SIZE_H2 = 28;       // Section headers
+    public static final int SIZE_H3 = 24;       // Card titles
+    public static final int SIZE_H4 = 20;       // Sub-headers
+    public static final int SIZE_BODY_LARGE = 18;  // Large body text
+    public static final int SIZE_BODY = 14;     // Default body text
+    public static final int SIZE_BODY_SMALL = 13;  // Secondary body
+    public static final int SIZE_CAPTION = 11; // Labels, captions
+    public static final int SIZE_TINY = 10;     // Tiny text
     
-    /**
-     * Load custom font from resources (if available)
-     */
-    public static Font loadFont(String fontPath, float size) {
-        try {
-            InputStream is = FontHelper.class.getResourceAsStream(fontPath);
-            if (is != null) {
-                Font font = Font.createFont(Font.TRUETYPE_FONT, is);
-                return font.deriveFont(size);
-            }
-        } catch (FontFormatException | IOException e) {
-            System.err.println("Failed to load font: " + fontPath);
-            e.printStackTrace();
+    // ============================================
+    // FONT WEIGHTS
+    // ============================================
+    public static final int WEIGHT_BOLD = Font.BOLD;
+    public static final int WEIGHT_REGULAR = Font.PLAIN;
+    public static final int WEIGHT_MEDIUM = Font.BOLD; // Use bold for medium
+    
+    // ============================================
+    // STYLED FONTS CACHE
+    // ============================================
+    private static final Map<String, Font> fontCache = new HashMap<>();
+    
+    // ============================================
+    // TITLE FONTS
+    // ============================================
+    public static Font display() {
+        return getFont(FONT_SANS_SERIF, SIZE_DISPLAY, WEIGHT_BOLD);
+    }
+    
+    public static Font displayLight() {
+        return getFont(FONT_SANS_SERIF, SIZE_DISPLAY, WEIGHT_REGULAR);
+    }
+    
+    public static Font h1() {
+        return getFont(FONT_SANS_SERIF, SIZE_H1, WEIGHT_BOLD);
+    }
+    
+    public static Font h1Light() {
+        return getFont(FONT_SANS_SERIF, SIZE_H1, WEIGHT_REGULAR);
+    }
+    
+    public static Font h2() {
+        return getFont(FONT_SANS_SERIF, SIZE_H2, WEIGHT_BOLD);
+    }
+    
+    public static Font h2Light() {
+        return getFont(FONT_SANS_SERIF, SIZE_H2, WEIGHT_REGULAR);
+    }
+    
+    public static Font h3() {
+        return getFont(FONT_SANS_SERIF, SIZE_H3, WEIGHT_BOLD);
+    }
+    
+    public static Font h3Light() {
+        return getFont(FONT_SANS_SERIF, SIZE_H3, WEIGHT_REGULAR);
+    }
+    
+    public static Font h4() {
+        return getFont(FONT_SANS_SERIF, SIZE_H4, WEIGHT_BOLD);
+    }
+    
+    public static Font h4Light() {
+        return getFont(FONT_SANS_SERIF, SIZE_H4, WEIGHT_REGULAR);
+    }
+    
+    // ============================================
+    // BODY FONTS
+    // ============================================
+    public static Font bodyLarge() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY_LARGE, WEIGHT_REGULAR);
+    }
+    
+    public static Font body() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY, WEIGHT_REGULAR);
+    }
+    
+    public static Font bodyMedium() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY, WEIGHT_MEDIUM);
+    }
+    
+    public static Font bodyBold() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY, WEIGHT_BOLD);
+    }
+    
+    public static Font bodySmall() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY_SMALL, WEIGHT_REGULAR);
+    }
+    
+    public static Font bodySmallMedium() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY_SMALL, WEIGHT_MEDIUM);
+    }
+    
+    public static Font bodySmallBold() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY_SMALL, WEIGHT_BOLD);
+    }
+    
+    // ============================================
+    // LABEL & CAPTION FONTS
+    // ============================================
+    public static Font caption() {
+        return getFont(FONT_SANS_SERIF, SIZE_CAPTION, WEIGHT_REGULAR);
+    }
+    
+    public static Font captionMedium() {
+        return getFont(FONT_SANS_SERIF, SIZE_CAPTION, WEIGHT_MEDIUM);
+    }
+    
+    public static Font captionBold() {
+        return getFont(FONT_SANS_SERIF, SIZE_CAPTION, WEIGHT_BOLD);
+    }
+    
+    public static Font tiny() {
+        return getFont(FONT_SANS_SERIF, SIZE_TINY, WEIGHT_REGULAR);
+    }
+    
+    // ============================================
+    // SPECIALTY FONTS
+    // ============================================
+    public static Font mono() {
+        return getFont(FONT_MONOSPACE, SIZE_BODY, WEIGHT_REGULAR);
+    }
+    
+    public static Font monoSmall() {
+        return getFont(FONT_MONOSPACE, SIZE_BODY_SMALL, WEIGHT_REGULAR);
+    }
+    
+    // ============================================
+    // BUTTON FONTS
+    // ============================================
+    public static Font button() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY, WEIGHT_MEDIUM);
+    }
+    
+    public static Font buttonSmall() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY_SMALL, WEIGHT_MEDIUM);
+    }
+    
+    // ============================================
+    // TABLE FONTS
+    // ============================================
+    public static Font tableHeader() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY_SMALL, WEIGHT_BOLD);
+    }
+    
+    public static Font tableBody() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY, WEIGHT_REGULAR);
+    }
+    
+    // ============================================
+    // FORM FONTS
+    // ============================================
+    public static Font label() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY_SMALL, WEIGHT_MEDIUM);
+    }
+    
+    public static Font input() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY, WEIGHT_REGULAR);
+    }
+    
+    public static Font placeholder() {
+        return getFont(FONT_SANS_SERIF, SIZE_BODY, WEIGHT_REGULAR);
+    }
+    
+    // ============================================
+    // HELPER METHOD
+    // ============================================
+    private static Font getFont(String family, int size, int style) {
+        String key = family + "_" + size + "_" + style;
+        if (!fontCache.containsKey(key)) {
+            Font font = new Font(family, style, size);
+            fontCache.put(key, font);
+            return font;
         }
-        // Fallback to default
-        return new Font("Segoe UI", Font.PLAIN, (int) size);
+        return fontCache.get(key);
+    }
+    
+    // ============================================
+    // UTILITY METHODS
+    // ============================================
+    
+    /**
+     * Scale font size by percentage
+     */
+    public static Font scale(Font font, float scaleFactor) {
+        int newSize = Math.max(1, Math.round(font.getSize() * scaleFactor));
+        return font.deriveFont(font.getStyle(), newSize);
     }
     
     /**
-     * Create derived font with different size
+     * Get font with different size
      */
-    public static Font withSize(Font font, float size) {
-        return font.deriveFont(size);
+    public static Font withSize(Font font, int newSize) {
+        return font.deriveFont(font.getStyle(), newSize);
     }
     
     /**
-     * Create derived font with different style
+     * Get font with different style
      */
-    public static Font withStyle(Font font, int style) {
-        return font.deriveFont(style);
+    public static Font withStyle(Font font, int newStyle) {
+        return font.deriveFont(newStyle, font.getSize());
     }
     
     /**
-     * Create bold version of font
+     * Get font with different weight
      */
-    public static Font bold(Font font) {
-        return font.deriveFont(Font.BOLD);
+    public static Font withWeight(Font font, int weight) {
+        return font.deriveFont(weight, font.getSize());
     }
     
     /**
-     * Create italic version of font
+     * Calculate text width for a font
      */
-    public static Font italic(Font font) {
-        return font.deriveFont(Font.ITALIC);
+    public static int getTextWidth(String text, Font font) {
+        if (text == null || text.isEmpty()) return 0;
+        return (int) font.getStringBounds(text, 
+            new java.awt.font.FontRenderContext(null, true, true))
+            .getWidth();
+    }
+    
+    /**
+     * Get recommended component height based on context
+     */
+    public static int getComponentHeight(Context context) {
+        switch (context) {
+            case BUTTON:
+                return 40;
+            case BUTTON_SMALL:
+                return 32;
+            case INPUT:
+                return 44;
+            case INPUT_SMALL:
+                return 36;
+            case TABLE_ROW:
+                return 48;
+            case TABLE_ROW_COMPACT:
+                return 36;
+            case CARD:
+                return 56;
+            case TOOLBAR:
+                return 48;
+            case NAVIGATION:
+                return 44;
+            case HEADER:
+                return 64;
+            case MODAL:
+                return 56;
+            default:
+                return 40;
+        }
+    }
+    
+    public enum Context {
+        BUTTON,
+        BUTTON_SMALL,
+        INPUT,
+        INPUT_SMALL,
+        TABLE_ROW,
+        TABLE_ROW_COMPACT,
+        CARD,
+        TOOLBAR,
+        NAVIGATION,
+        HEADER,
+        MODAL
     }
 }

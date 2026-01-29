@@ -339,4 +339,32 @@ public class FormQuanLyKhachHang extends JFrame {
         buttonBar.add(btnSave);
         return buttonBar;
     }
+
+    private void applyPermissions() {
+        String role = SessionManager.getInstance().getRole();
+
+        if (!PermissionService.canView(role, "CUSTOMER")) {
+            JOptionPane.showMessageDialog(this,
+                "BAN KHONG CO QUYEN TRUY CAP CHUC NANG NAY!",
+                "Tu choi truy cap",
+                JOptionPane.ERROR_MESSAGE);
+            dispose();
+            return;
+        }
+
+        if (!PermissionService.canCreate(role, "CUSTOMER")) {
+            btnAdd.setEnabled(false);
+            btnAdd.setToolTipText("Ban khong co quyen them khach hang");
+        }
+
+        if (!PermissionService.canUpdate(role, "CUSTOMER")) {
+            btnEdit.setEnabled(false);
+            btnEdit.setToolTipText("Ban khong co quyen sua khach hang");
+        }
+
+        if (!PermissionService.canDelete(role, "CUSTOMER")) {
+            btnDelete.setEnabled(false);
+            btnDelete.setToolTipText("Ban khong co quyen xoa khach hang");
+        }
+    }
 }

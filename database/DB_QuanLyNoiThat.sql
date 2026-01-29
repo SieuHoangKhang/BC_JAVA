@@ -1,16 +1,22 @@
 -- =============================================
--- HỆ THỐNG QUẢN LÝ CỬA HÀNG NỘI THẤT
+-- HE THONG QUAN LY CUA HANG NOI THAT
 -- Database: DB_QuanLyNoiThat
--- Tác giả: Theo yêu cầu giáo viên
+-- Phien ban hoan chinh voi du lieu mau
 -- =============================================
 
--- Tạo database mới
-IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'DB_QuanLyNoiThat')
+-- Ngat ket noi va xoa database cu (neu ton tai)
+USE master;
+GO
+
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'DB_QuanLyNoiThat')
 BEGIN
+    -- Dong tat ca cac ket noi hien tai
+    ALTER DATABASE DB_QuanLyNoiThat SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
     DROP DATABASE DB_QuanLyNoiThat;
 END
 GO
 
+-- Tao database moi
 CREATE DATABASE DB_QuanLyNoiThat;
 GO
 
@@ -18,7 +24,7 @@ USE DB_QuanLyNoiThat;
 GO
 
 -- =============================================
--- BẢNG 1: USERS - Người dùng hệ thống
+-- BANG 1: USERS - Nguoi dung he thong
 -- =============================================
 CREATE TABLE Users (
     UserID INT IDENTITY(1,1) PRIMARY KEY,
@@ -212,7 +218,6 @@ ON OrderDetails
 AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
-    -- Cập nhật tổng tiền của đơn hàng bị ảnh hưởng
     UPDATE Orders
     SET TotalAmount = (
         SELECT ISNULL(SUM(Subtotal), 0)
@@ -250,53 +255,128 @@ GROUP BY p.ProductID, p.ProductName, c.CategoryName, s.SupplierName, p.Price, p.
 GO
 
 -- =============================================
--- STORED PROCEDURE: Tạo đơn hàng mới
+-- =================== DỮ LIỆU MẪU ===================
 -- =============================================
-CREATE PROCEDURE sp_CreateOrder
-    @CustomerID INT,
-    @UserID INT,
-    @PaymentMethod VARCHAR(50),
-    @Note NVARCHAR(500),
-    @OrderID INT OUTPUT
-AS
-BEGIN
-    INSERT INTO Orders (CustomerID, UserID, PaymentMethod, Note)
-    VALUES (@CustomerID, @UserID, @PaymentMethod, @Note);
-    
-    SET @OrderID = SCOPE_IDENTITY();
-END;
+
+-- Thêm Users
+INSERT INTO Users (Username, Password, FullName, Role, Phone, Email) VALUES
+('admin', '123456', N'Administrator', 'Admin', '0901234567', 'admin@noithat.com'),
+('manager1', '123456', N'Nguyễn Văn Quản Lý', 'Manager', '0901234568', 'manager@noithat.com'),
+('staff1', '123456', N'Trần Thị Nhân Viên', 'Staff', '0901234569', 'staff1@noithat.com'),
+('staff2', '123456', N'Lê Văn Nhân Viên 2', 'Staff', '0901234570', 'staff2@noithat.com');
 GO
 
--- =============================================
--- STORED PROCEDURE: Thêm sản phẩm vào đơn hàng
--- =============================================
-CREATE PROCEDURE sp_AddOrderDetail
-    @OrderID INT,
-    @ProductID INT,
-    @Quantity INT,
-    @Discount DECIMAL(5,2) = 0
-AS
-BEGIN
-    DECLARE @UnitPrice DECIMAL(18, 0);
-    
-    -- Lấy giá sản phẩm hiện tại
-    SELECT @UnitPrice = Price FROM Products WHERE ProductID = @ProductID;
-    
-    -- Thêm vào chi tiết đơn hàng
-    INSERT INTO OrderDetails (OrderID, ProductID, Quantity, UnitPrice, Discount)
-    VALUES (@OrderID, @ProductID, @Quantity, @UnitPrice, @Discount);
-    
-    -- Trừ tồn kho
-    UPDATE Products SET Stock = Stock - @Quantity WHERE ProductID = @ProductID;
-END;
+-- Thêm Categories
+INSERT INTO Categories (CategoryName, Description) VALUES
+(N'Ghế Sofa', N'Các loại ghế sofa da, vải, nỉ cao cấp'),
+(N'Bàn Gỗ', N'Bàn gỗ tự nhiên và gỗ công nghiệp'),
+(N'Tủ Quần Áo', N'Tủ quần áo các kích thước'),
+(N'Giường Ngủ', N'Giường ngủ đơn, đôi, king size'),
+(N'Kệ Sách', N'Kệ sách và tủ trang trí'),
+(N'Bàn Trang Điểm', N'Bàn trang điểm có gương'),
+(N'Đèn Trang Trí', N'Đèn chùm, đèn bàn, đèn sàn'),
+(N'Phụ Kiện', N'Các phụ kiện trang trí nội thất');
 GO
 
-PRINT 'Database DB_QuanLyNoiThat đã được tạo thành công!';
+-- Thêm Suppliers
+INSERT INTO Suppliers (SupplierName, ContactPerson, Phone, Email, Address) VALUES
+(N'Công Ty Gỗ Mỹ Nghệ Xanh', N'Phạm Văn Gỗ', '0912345678', 'gonhap@xanh.vn', N'123 Đường Gỗ, Quận 5, TP.HCM'),
+(N'HTX Mỹ Nghệ Đồ Gỗ', N'Nguyễn Thị Mộc', '0912345679', 'monghe@htx.vn', N'456 Đường Hàng Thủ Công, Long An'),
+(N'Công Ty Nội Thất Star', N'Lê Hùng Star', '0912345680', 'star@noithat.vn', N'789 Đường Công Nghiệp, Bình Dương'),
+(N'Nhà Máy Sản Xuất Nội Thất Kim Oanh', N'Trần Kim Oanh', '0912345681', 'kimoanh@nm.vn', N'321 Đường Sản Xuất, Đồng Nai');
+GO
 
-USE DB_QuanLyNoiThat;
+-- Thêm Products
+INSERT INTO Products (ProductName, CategoryID, SupplierID, Price, Stock, Description, Material, Size, Color) VALUES
+(N'Sofa Da Cao Cấp 3 Chỗ', 1, 1, 15000000, 10, N'Sofa da thật nhập khẩu, bền đẹp', N'Da thật', '220x90x85cm', N'Nâu'),
+(N'Sofa Vải Xanh Navy', 1, 2, 8500000, 15, N'Sofa vải nỉ cao cấp, màu xanh navy đẹp', N'Vải nỉ', '200x85x80cm', N'Xanh Navy'),
+(N'Bàn Gỗ Teak Cao Cấp', 2, 1, 6500000, 20, N'Bàn gỗ teak tự nhiên, chân thép không gỉ', N'Gỗ Teak', '160x80x75cm', N'Nâu tự nhiên'),
+(N'Bàn Trà Oval Gỗ Sồi', 2, 3, 4200000, 25, N'Bàn trà hình oval, gỗ sồi Mỹ', N'Gỗ Sồi', '120x60x45cm', N'Nâu sáng'),
+(N'Tủ Quần Áo 4 Cánh', 3, 2, 12500000, 8, N'Tủ quần áo rộng rãi, có gương', N'Gỗ MDF', '200x60x220cm', N'Trắng'),
+(N'Tủ Trang Trí Đa Năng', 3, 4, 5800000, 12, N'Tủ trang trí có ngăn kéo', N'Gỗ công nghiệp', '120x40x180cm', N'Vàng óc chó'),
+(N'Giường Ngủ King Size', 4, 1, 18500000, 5, N'Giường ngủ cỡ lớn, đầu giường bọc da', N'Gỗ + Da', '200x200cm', N'Xám'),
+(N'Giường Ngủ Đơn Trẻ Em', 4, 3, 7500000, 15, N'Giường ngủ đơn cho trẻ em, màu sắc tươi sáng', N'Gỗ thông', '120x190cm', N'Hồng'),
+(N'Kệ Sách 5 Tầng', 5, 2, 2800000, 30, N'Kệ sách hiện đại, tối giản', N'Gỗ MDF', '80x30x180cm', N'Trắng'),
+(N'Kệ Trang Trí Treo Tường', 5, 4, 1200000, 40, N'Kệ treo tường mini, trang trí', N'Gỗ tre', '60x20x25cm', N'Nâu'),
+(N'Bàn Trang Điểm Gương Tròn', 6, 1, 4500000, 18, N'Bàn trang điểm có gương tròn, đèn LED', N'Gỗ + Kính', '90x40x75cm', N'Trắng'),
+(N'Bàn Trang Điểm Có Ngăn', 6, 3, 3800000, 22, N'Bàn trang điểm nhiều ngăn kéo', N'Gỗ MDF', '80x45x70cm', N'Hồng nhạt'),
+(N'Đèn Chùm Pha Lê', 7, 1, 25000000, 3, N'Đèn chùm pha lê pha lê cao cấp', N'Pha lê + Kim loại', '80x80x60cm', N'Trong suốt'),
+(N'Đèn Bàn Đọc Sách LED', 7, 4, 850000, 50, N'Đèn bàn LED, điều chỉnh độ sáng', N'Kim loại + Nhựa', '40x20x45cm', N'Đen'),
+(N'Khung Tranh Treo Tường', 8, 2, 350000, 60, N'Khung tranh trang trí đa kích thước', N'Gỗ + Kính', '50x70cm', N'Vàng'),
+(N'Gương Trang Trí Vuông', 8, 1, 1200000, 35, N'Gương trang trí hình vuông viền kim loại', N'Kính + Kim loại', '60x60cm', N'Bạc');
+GO
+
+-- Thêm Customers
+INSERT INTO Customers (CustomerName, Phone, Email, Address, TotalPurchase) VALUES
+(N'Nguyễn Thị Lan', '0909876541', 'lan.nguyen@email.com', N'123 Lê Lợi, Quận 1, TP.HCM', 25000000),
+(N'Trần Văn Minh', '0909876542', 'minh.tran@email.com', N'456 Nguyễn Trãi, Quận 5, TP.HCM', 18500000),
+(N'Lê Hoàng Mai', '0909876543', 'mai.le@email.com', N'789 Điện Biên Phủ, Quận 3, TP.HCM', 42000000),
+(N'Phạm Quốc Hùng', '0909876544', 'hung.pham@email.com', N'321 Võ Văn Ngân, Thủ Đức', 15000000),
+(N'Đặng Thị Hà', '0909876545', 'ha.dang@email.com', N'654 Cộng Hòa, Tân Bình', 32000000),
+(N'Bùi Văn Tài', '0909876546', 'tai.bui@email.com', N'987 Lý Thường Kiệt, Quận 10', 28000000),
+(N'Vũ Thị Thu', '0909876547', 'thu.vu@email.com', N'147 Hoàng Văn Thụ, Phú Nhuận', 9500000),
+(N'Đinh Văn Nam', '0909876548', 'nam.dinh@email.com', N'258 Vạn Hạnh, Quận 10', 16500000);
+GO
+
+-- Thêm Orders (Đơn hàng mẫu)
+INSERT INTO Orders (CustomerID, UserID, TotalAmount, Status, PaymentMethod, Note) VALUES
+(1, 1, 15000000, 'Completed', 'Tiền mặt', N'Khách hàng VIP'),
+(2, 2, 8500000, 'Completed', 'Chuyển khoản', N'Giao hàng tận nơi'),
+(3, 1, 12500000, 'Processing', 'Thẻ tín dụng', N'Yêu cầu giao buổi tối'),
+(4, 3, 6500000, 'Pending', 'Tiền mặt', N'Liên hệ trước khi giao'),
+(5, 2, 18500000, 'Completed', 'Trả góp', N'Trả góp 6 tháng'),
+(6, 1, 4200000, 'Completed', 'Chuyển khoản', N'Khách quen'),
+(7, 3, 28000000, 'Cancelled', 'Tiền mặt', N'Hủy do khách đổi ý'),
+(8, 2, 12000000, 'Processing', 'Thẻ tín dụng', N'Giao hàng ngoại thành');
+GO
+
+-- Thêm Order Details
+INSERT INTO OrderDetails (OrderID, ProductID, Quantity, UnitPrice, Discount) VALUES
+(1, 1, 1, 15000000, 0),
+(2, 2, 1, 8500000, 0),
+(3, 5, 1, 12500000, 0),
+(4, 3, 1, 6500000, 0),
+(5, 7, 1, 18500000, 5),
+(6, 4, 1, 4200000, 0),
+(7, 10, 10, 1200000, 10),
+(8, 6, 2, 5800000, 5);
+GO
+
+-- Thêm Inventory Transactions
+INSERT INTO Inventory (ProductID, TransactionType, Quantity, Note, UserID) VALUES
+(1, 'In', 15, N'Nhập hàng đầu tháng', 1),
+(2, 'In', 20, N'Nhập hàng đầu tháng', 1),
+(3, 'In', 25, N'Nhập hàng đầu tháng', 2),
+(4, 'In', 30, N'Nhập hàng đầu tháng', 2),
+(5, 'In', 10, N'Nhập hàng đầu tháng', 1),
+(6, 'In', 15, N'Nhập hàng đầu tháng', 3),
+(7, 'In', 8, N'Nhập hàng đầu tháng', 1),
+(8, 'In', 20, N'Nhập hàng đầu tháng', 2),
+(9, 'In', 35, N'Nhập hàng đầu tháng', 3),
+(10, 'In', 50, N'Nhập hàng đầu tháng', 2),
+(1, 'Out', 5, N'Bán cho khách', 1),
+(2, 'Out', 5, N'Bán cho khách', 2),
+(3, 'Out', 5, N'Bán cho khách', 1);
+GO
+
+PRINT '===========================================';
+PRINT '  Database DB_QuanLyNoiThat đã được tạo thành công!';
+PRINT '  Tổng số: 4 Users, 8 Categories, 4 Suppliers';
+PRINT '  16 Products, 8 Customers, 8 Orders, 8 OrderDetails';
+PRINT '===========================================';
+
+-- Kiểm tra dữ liệu
+SELECT 'Users:' AS N'Tiêu đề';
 SELECT * FROM Users;
+
+SELECT 'Categories:' AS N'Tiêu đề';
+SELECT * FROM Categories;
+
+SELECT 'Suppliers:' AS N'Tiêu đề';
+SELECT * FROM Suppliers;
+
+SELECT 'Products:' AS N'Tiêu đề';
 SELECT * FROM Products;
 
-USE DB_QuanLyNoiThat;
-INSERT INTO Users (Username, Password, FullName, Role) 
-VALUES ('admin', '123456', N'Administrator', 'Admin');
+SELECT 'Customers:' AS N'Tiêu đề';
+SELECT * FROM Customers;

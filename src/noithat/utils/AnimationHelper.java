@@ -90,7 +90,6 @@ public class AnimationHelper {
             @Override
             public void actionPerformed(ActionEvent e) {
                 step++;
-                float progress = (float) step / steps;
                 
                 int currentX = (int) (component.getX() + (finalPos.x - component.getX()) * 0.1f);
                 int currentY = (int) (component.getY() + (finalPos.y - component.getY()) * 0.1f);

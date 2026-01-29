@@ -338,4 +338,32 @@ public class FormQuanLyNhaCungCap extends JFrame {
         buttonBar.add(btnSave);
         return buttonBar;
     }
+
+    private void applyPermissions() {
+        String role = SessionManager.getInstance().getRole();
+
+        if (!PermissionService.canView(role, "SUPPLIER")) {
+            JOptionPane.showMessageDialog(this,
+                "BAN KHONG CO QUYEN TRUY CAP CHUC NANG NAY!",
+                "Tu choi truy cap",
+                JOptionPane.ERROR_MESSAGE);
+            dispose();
+            return;
+        }
+
+        if (!PermissionService.canCreate(role, "SUPPLIER")) {
+            btnAdd.setEnabled(false);
+            btnAdd.setToolTipText("Ban khong co quyen them NCC");
+        }
+
+        if (!PermissionService.canUpdate(role, "SUPPLIER")) {
+            btnEdit.setEnabled(false);
+            btnEdit.setToolTipText("Ban khong co quyen sua NCC");
+        }
+
+        if (!PermissionService.canDelete(role, "SUPPLIER")) {
+            btnDelete.setEnabled(false);
+            btnDelete.setToolTipText("Ban khong co quyen xoa NCC");
+        }
+    }
 }

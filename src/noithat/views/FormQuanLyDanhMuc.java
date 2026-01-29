@@ -375,4 +375,32 @@ public class FormQuanLyDanhMuc extends JFrame {
         buttonBar.add(btnSave);
         return buttonBar;
     }
+
+    private void applyPermissions() {
+        String role = SessionManager.getInstance().getRole();
+
+        if (!PermissionService.canView(role, "CATEGORY")) {
+            JOptionPane.showMessageDialog(this,
+                "BAN KHONG CO QUYEN TRUY CAP CHUC NANG NAY!",
+                "Tu choi truy cap",
+                JOptionPane.ERROR_MESSAGE);
+            dispose();
+            return;
+        }
+
+        if (!PermissionService.canCreate(role, "CATEGORY")) {
+            btnAdd.setEnabled(false);
+            btnAdd.setToolTipText("Ban khong co quyen them danh muc");
+        }
+
+        if (!PermissionService.canUpdate(role, "CATEGORY")) {
+            btnEdit.setEnabled(false);
+            btnEdit.setToolTipText("Ban khong co quyen sua danh muc");
+        }
+
+        if (!PermissionService.canDelete(role, "CATEGORY")) {
+            btnDelete.setEnabled(false);
+            btnDelete.setToolTipText("Ban khong co quyen xoa danh muc");
+        }
+    }
 }
