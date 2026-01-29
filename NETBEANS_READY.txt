@@ -1,0 +1,128 @@
+✅ DỰ ÁN ĐÃ ĐƯỢC DỌN DẸP - SẴN DÙNG VỚI NETBEANS
+
+════════════════════════════════════════════════════════════════
+
+📊 CẤUTRÚC CUỐI CÙNG
+
+QuanLyNoiThat/
+├── src/                              ← Mã nguồn Java (29 file)
+├── database/                         ← SQL scripts
+│   ├── DB_QuanLyNoiThat.sql
+│   └── SampleData.sql
+├── lib/                              ← JDBC Driver
+├── nbproject/                        ← NetBeans project files
+├── build.xml                         ← Ant build file
+├── manifest.mf                       ← Manifest
+└── README.md                         ← Hướng dẫn
+
+🗑️  ĐÃ XÓA CÁC FILE VÔ DỤNG:
+✓ Tất cả .bat, .sh files (build_new.bat, run.bat, build_run.sh)
+✓ Tất cả .txt docs (QUICK_START, PROJECT_SUMMARY, v.v.)
+✓ build/ folder (NetBeans sẽ tạo lại)
+✓ logs/ folder (tạo tự động khi chạy)
+✓ dist/ folder (không cần)
+✓ Test.java, Test.class
+✓ SQLQuery1.sql
+✓ SQL files ở root (chỉ giữ trong database/)
+✓ Duplicate JDBC driver
+
+════════════════════════════════════════════════════════════════
+
+🚀 CÁCH CHẠY VỚI NETBEANS
+
+1. MỞ PROJECT
+   - File → Open Project
+   - Chọn: d:\MON_HOC\JAVA\CÔ_TRINH\DO_AN_JAVA\QuanLyNoiThat
+   - NetBeans tự động nhận diện
+
+2. CẤU HÌNH CSDL (LẦN ĐẦU)
+   - Mở SQL Server Management Studio
+   - Chạy: database/DB_QuanLyNoiThat.sql
+   - Chạy: database/SampleData.sql
+
+3. BUILD & RUN
+   - Build: F11 (hay Shift+F11 để Clean & Build)
+   - Run: F6
+   - Hoặc: Run → Run Project
+
+4. ĐĂNG NHẬP
+   - Tài khoản: admin
+   - Mật khẩu: 123456
+
+════════════════════════════════════════════════════════════════
+
+📋 KIỂM TRA TRƯỚC CHẠY
+
+☐ Có src/ folder (29 Java files)
+☐ Có lib/ folder (JDBC Driver)
+☐ Có database/ folder (SQL scripts)
+☐ Có build.xml (NetBeans build file)
+☐ Có README.md (hướng dẫn)
+☐ SQL Server đang chạy
+☐ NetBeans đã mở project
+
+════════════════════════════════════════════════════════════════
+
+✨ ĐẶC ĐIỂM DỰ ÁN
+
+✅ 29 Java files (Main, 8 Models, 11 Utils, 9 Views, 1 Database)
+✅ 11 bảng CSDL (Users, Roles, Products, Customers, Orders, v.v.)
+✅ Kiểm soát quyền hạn theo vai trò (81 quyền)
+✅ Ghi log hoạt động (logs/activity.log)
+✅ Giao diện chuyên nghiệp (Modern buttons, rounded borders)
+✅ CRUD đầy đủ (Sản phẩm, KH, Đơn hàng, Kho, Danh mục, NCC, Báo cáo)
+✅ 4 tài khoản test (admin, manager1, staff1, staff2)
+✅ 0 lỗi biên dịch
+✅ SẴN DÙNG NGAY
+
+════════════════════════════════════════════════════════════════
+
+🎯 VỀ BÁOCC DỰÁN
+
+Dự án này có:
+- Toàn bộ source code cần thiết
+- Database schema & sample data
+- Build configuration (build.xml)
+- Manifest file
+- README hướng dẫn
+
+KHÔNG CÓ:
+- Những file tạm thời
+- Build artifacts (sẽ tạo tự động)
+- Log files (tạo lúc chạy)
+- Documentation thừa (chỉ giữ README)
+
+════════════════════════════════════════════════════════════════
+
+💡 MẢO NHỎ
+
+1. Nếu NetBeans không nhận source encoding:
+   → Project Properties → Sources → UTF-8
+
+2. Nếu lỗi kết nối CSDL:
+   → Kiểm tra DatabaseHelper.java
+   → Đảm bảo SQL Server đang chạy
+
+3. Nếu lỗi thư viện JDBC:
+   → Right-click project → Properties → Libraries
+   → Add JAR/Folder → Chọn lib/ folder
+
+4. NetBeans nên tự động:
+   - Phát hiện build.xml
+   - Tạo build/ folder
+   - Compile sources
+   - Tạo logs/ folder khi chạy
+
+════════════════════════════════════════════════════════════════
+
+✅ TÌNH TRẠNG: SẴN DÙNG - GIỮ SẠCh
+
+Dự án đã được dọn dẹp hoàn toàn. Chỉ còn lại các file cần thiết
+để chạy qua NetBeans và sử dụng cho báo cáo dự án.
+
+Bất cứ lúc nào bạn mở project trong NetBeans, nó sẽ tự động
+tạo build/ và logs/ folders khi biên dịch lần đầu.
+
+════════════════════════════════════════════════════════════════
+
+🎉 DỰ ÁN SẴN DÙNG!

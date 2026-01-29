@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: noithat.Main
+Class-Path: lib/mssql-jdbc-12.2.0.jre11.jar
+X-COMMENT: Quản Lý Nội Thất
+

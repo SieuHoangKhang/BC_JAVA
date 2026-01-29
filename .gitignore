@@ -1,0 +1,10 @@
+build/
+dist/
+*.class
+*.jar
+*.log
+.DS_Store
+nbproject/private/
+.netbeans
+.vscode
+*.swp
