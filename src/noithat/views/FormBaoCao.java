@@ -22,55 +22,60 @@ public class FormBaoCao extends JFrame {
     private void initComponents() {
         setTitle("Báo Cáo & Thống Kê");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1400, 800);
+        setSize(1400, 750);
         setLocationRelativeTo(null);
         setResizable(true);
         
         // Header Panel
         JPanel headerPanel = new GradientPanel(ColorTheme.SUCCESS, new Color(46, 204, 113));
         headerPanel.setLayout(new BorderLayout());
-        headerPanel.setPreferredSize(new Dimension(1400, 45));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         
-        JLabel lblTitle = new JLabel("Báo Cáo & Thống Kê");
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 20));
+        JLabel lblTitle = new JLabel("📊 BÁO CÁO & THỐNG KÊ");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(Color.WHITE);
-        lblTitle.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 5));
         
-        lblStatus = new JLabel("0 bản ghi");
-        lblStatus.setFont(new Font("Arial", Font.PLAIN, 12));
+        lblStatus = new JLabel("Tổng: 0 bản ghi");
+        lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblStatus.setForeground(Color.WHITE);
-        lblStatus.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 20));
         
-        btnBack = new ModernButton("Quay Lại");
-        btnBack.setPreferredSize(new Dimension(100, 35));
+        btnBack = new ModernButton("← Quay Lại", ColorTheme.DANGER);
+        btnBack.setPreferredSize(new Dimension(140, 45));
         btnBack.addActionListener(e -> this.dispose());
         
-        headerPanel.add(lblTitle, BorderLayout.WEST);
+        JPanel headerLeft = new JPanel();
+        headerLeft.setOpaque(false);
+        headerLeft.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        headerLeft.add(lblTitle);
+        headerLeft.add(lblStatus);
+        
+        headerPanel.add(headerLeft, BorderLayout.WEST);
         headerPanel.add(btnBack, BorderLayout.EAST);
-        headerPanel.add(lblStatus, BorderLayout.CENTER);
         
         // Control Panel
         JPanel controlPanel = new JPanel();
-        controlPanel.setBackground(Color.WHITE);
-        controlPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        controlPanel.setBackground(ColorTheme.SURFACE);
+        controlPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 20));
+        controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
         
-        JLabel lblReportType = new JLabel("Loại Báo Cáo:");
-        lblReportType.setFont(new Font("Arial", Font.PLAIN, 12));
+        JLabel lblReportType = new JLabel("🔍 Loại Báo Cáo:");
+        lblReportType.setFont(new Font("Segoe UI", Font.BOLD, 12));
         cmbReportType = new JComboBox<>(new String[]{
             "Doanh Thu Bán Hàng",
             "Sản Phẩm Bán Chạy",
             "Khách Hàng Thường Xuyên",
             "Tồn Kho Sản Phẩm"
         });
-        cmbReportType.setPreferredSize(new Dimension(200, 30));
+        cmbReportType.setPreferredSize(new Dimension(220, 40));
         cmbReportType.addActionListener(e -> loadData());
         
-        btnRefresh = new ModernButton("🔄 Tải Lại");
+        btnRefresh = new ModernButton("🔄 Làm mới", ColorTheme.SUCCESS);
+        btnRefresh.setPreferredSize(new Dimension(120, 40));
         btnRefresh.addActionListener(e -> loadData());
         
-        btnExport = new ModernButton("📊 Xuất Excel");
-        btnExport.addActionListener(e -> JOptionPane.showMessageDialog(this, "Chức năng xuất Excel đang phát triển!"));
+        btnExport = new ModernButton("📊 Xuất Excel", ColorTheme.INFO);
+        btnExport.setPreferredSize(new Dimension(130, 40));
+        btnExport.addActionListener(e -> ToastNotification.show(this, "Chức năng xuất Excel đang phát triển!", ToastNotification.INFO));
         
         controlPanel.add(lblReportType);
         controlPanel.add(cmbReportType);
@@ -79,7 +84,8 @@ public class FormBaoCao extends JFrame {
         
         // Table Panel
         JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBackground(Color.WHITE);
+        tablePanel.setBackground(ColorTheme.BACKGROUND);
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         
         tableModel = new DefaultTableModel(
             new String[]{"STT", "Dữ Liệu", "Giá Trị"},
@@ -87,17 +93,25 @@ public class FormBaoCao extends JFrame {
         ) { public boolean isCellEditable(int r, int c) { return false; } };
         
         tableReport = new JTable(tableModel);
-        tableReport.setRowHeight(25);
-        tableReport.setFont(new Font("Arial", Font.PLAIN, 12));
-        tableReport.getTableHeader().setBackground(ColorTheme.SUCCESS);
-        tableReport.getTableHeader().setForeground(Color.WHITE);
-        tableReport.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        tableReport.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tableReport.setRowHeight(28);
+        tableReport.setSelectionBackground(ColorTheme.SUCCESS);
+        tableReport.setSelectionForeground(Color.WHITE);
+        tableReport.setGridColor(ColorTheme.BORDER);
+        
+        javax.swing.table.JTableHeader header = tableReport.getTableHeader();
+        header.setBackground(ColorTheme.SECONDARY);
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        header.setPreferredSize(new Dimension(0, 35));
         
         JScrollPane scrollPane = new JScrollPane(tableReport);
+        scrollPane.setBorder(BorderFactory.createLineBorder(ColorTheme.BORDER, 1));
         tablePanel.add(scrollPane, BorderLayout.CENTER);
         
         // Main layout
         JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(ColorTheme.BACKGROUND);
         mainPanel.add(controlPanel, BorderLayout.NORTH);
         mainPanel.add(tablePanel, BorderLayout.CENTER);
         
@@ -121,7 +135,7 @@ public class FormBaoCao extends JFrame {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi tải báo cáo!");
+            ToastNotification.show(this, "Lỗi tải báo cáo: " + e.getMessage(), ToastNotification.ERROR);
         }
     }
     
@@ -142,7 +156,7 @@ public class FormBaoCao extends JFrame {
                     CurrencyHelper.formatCurrency(rs.getDouble("TotalAmount"))
                 });
             }
-            lblStatus.setText(count - 1 + " đơn hàng");
+            lblStatus.setText("Tổng: " + (count - 1) + " đơn hàng");
         }
     }
     
@@ -163,7 +177,7 @@ public class FormBaoCao extends JFrame {
                     CurrencyHelper.formatCurrency(rs.getDouble("Revenue"))
                 });
             }
-            lblStatus.setText(count - 1 + " sản phẩm");
+            lblStatus.setText("Tổng: " + (count - 1) + " sản phẩm");
         }
     }
     
@@ -184,7 +198,7 @@ public class FormBaoCao extends JFrame {
                     CurrencyHelper.formatCurrency(rs.getDouble("TotalSpent"))
                 });
             }
-            lblStatus.setText(count - 1 + " khách hàng");
+            lblStatus.setText("Tổng: " + (count - 1) + " khách hàng");
         }
     }
     
@@ -207,7 +221,7 @@ public class FormBaoCao extends JFrame {
                     qty + " cái"
                 });
             }
-            lblStatus.setText(count - 1 + " sản phẩm");
+            lblStatus.setText("Tổng: " + (count - 1) + " sản phẩm");
         }
     }
 }

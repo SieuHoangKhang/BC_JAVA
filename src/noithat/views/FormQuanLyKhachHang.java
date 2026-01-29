@@ -3,152 +3,160 @@ package noithat.views;
 import noithat.database.DatabaseHelper;
 import noithat.utils.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.*;
 
 public class FormQuanLyKhachHang extends JFrame {
-    private JTable tableCustomers;
+    private ModernTable tableCustomers;
     private DefaultTableModel tableModel;
-    private JTextField txtSearch;
-    private ModernButton btnSearch, btnRefresh, btnBack;
-    private JLabel lblTotalCount;
+    private SearchField txtSearch;
+    private ToolbarButton btnAdd, btnEdit, btnDelete;
+    private JLabel lblStatus;
+    private int selectedCustomerId = -1;
     
     public FormQuanLyKhachHang() {
         initComponents();
         loadData();
+        applyPermissions();
     }
     
     private void initComponents() {
         setTitle("Quản Lý Khách Hàng");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1300, 700);
+        setSize(1200, 700);
+        setMinimumSize(new Dimension(1000, 600));
         setLocationRelativeTo(null);
-        setResizable(true);
+        setBackground(ProfessionalColors.BACKGROUND);
         
-        // ===== HEADER =====
-        JPanel headerPanel = new GradientPanel(ColorTheme.SUCCESS, new Color(46, 204, 113));
-        headerPanel.setLayout(new BorderLayout());
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        JPanel header = createHeader();
+        JPanel toolbar = createToolbar();
+        JPanel tablePanel = createTablePanel();
+        JPanel statusBar = createStatusBar();
         
-        JLabel lblTitle = new JLabel("👥 QUẢN LÝ KHÁCH HÀNG");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        lblTitle.setForeground(Color.WHITE);
+        setLayout(new BorderLayout());
+        add(header, BorderLayout.NORTH);
+        add(toolbar, BorderLayout.BEFORE_FIRST_LINE);
         
-        lblTotalCount = new JLabel("Tổng: 0 khách hàng");
-        lblTotalCount.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblTotalCount.setForeground(Color.WHITE);
+        JPanel contentWrapper = new JPanel(new BorderLayout());
+        contentWrapper.setBackground(ProfessionalColors.BACKGROUND);
+        contentWrapper.setBorder(new EmptyBorder(0, 16, 16, 16));
+        contentWrapper.add(tablePanel, BorderLayout.CENTER);
+        add(contentWrapper, BorderLayout.CENTER);
+        add(statusBar, BorderLayout.SOUTH);
+    }
+    
+    private JPanel createHeader() {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(Color.WHITE);
+        header.setBorder(new CompoundBorder(
+            new MatteBorder(0, 0, 1, 0, ProfessionalColors.BORDER),
+            new EmptyBorder(12, 20, 12, 20)
+        ));
         
-        btnBack = new ModernButton("← Quay Lại", ColorTheme.DANGER);
-        btnBack.setPreferredSize(new Dimension(140, 45));
+        JLabel title = new JLabel("Quản Lý Khách Hàng");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setForeground(ProfessionalColors.TEXT_PRIMARY);
         
-        JPanel headerLeft = new JPanel();
-        headerLeft.setOpaque(false);
-        headerLeft.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 0));
-        headerLeft.add(lblTitle);
-        headerLeft.add(lblTotalCount);
+        ToolbarButton btnClose = new ToolbarButton("X", ProfessionalColors.DANGER);
+        btnClose.setPreferredSize(new Dimension(40, 36));
+        btnClose.addActionListener(e -> dispose());
         
-        headerPanel.add(headerLeft, BorderLayout.WEST);
-        headerPanel.add(btnBack, BorderLayout.EAST);
+        header.add(title, BorderLayout.WEST);
+        header.add(btnClose, BorderLayout.EAST);
+        return header;
+    }
+    
+    private JPanel createToolbar() {
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        toolbar.setBackground(Color.WHITE);
+        toolbar.setBorder(new CompoundBorder(
+            new MatteBorder(0, 0, 1, 0, ProfessionalColors.BORDER_LIGHT),
+            new EmptyBorder(4, 16, 4, 16)
+        ));
         
-        // ===== SEARCH =====
-        JPanel searchPanel = new JPanel();
-        searchPanel.setBackground(ColorTheme.SURFACE);
-        searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 20));
+        ToolbarButton btnBack = new ToolbarButton("← Quay Lại", ProfessionalColors.DANGER);
+        btnBack.setPreferredSize(new Dimension(120, 36));
+        btnBack.addActionListener(e -> dispose());
         
-        JLabel lblSearch = new JLabel("🔍 Tìm kiếm:");
-        lblSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnAdd = new ToolbarButton("+ Thêm", ProfessionalColors.SUCCESS);
+        btnAdd.addActionListener(e -> showAddDialog());
         
-        txtSearch = new JTextField(35);
-        txtSearch.setPreferredSize(new Dimension(350, 40));
-        txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtSearch.setBorder(new RoundedBorder(8, ColorTheme.BORDER));
+        btnEdit = new ToolbarButton("Sửa", ProfessionalColors.PRIMARY);
+        btnEdit.addActionListener(e -> showEditDialog());
         
-        btnSearch = new ModernButton("🔎 Tìm", ColorTheme.INFO);
-        btnSearch.setPreferredSize(new Dimension(100, 40));
+        btnDelete = new ToolbarButton("Xóa", ProfessionalColors.DANGER);
+        btnDelete.addActionListener(e -> deleteCustomer());
         
-        btnRefresh = new ModernButton("🔄 Làm mới", ColorTheme.SUCCESS);
-        btnRefresh.setPreferredSize(new Dimension(120, 40));
+        toolbar.add(btnBack);
+        toolbar.add(Box.createHorizontalStrut(12));
+        toolbar.add(btnAdd);
+        toolbar.add(btnEdit);
+        toolbar.add(btnDelete);
         
-        searchPanel.add(lblSearch);
-        searchPanel.add(txtSearch);
-        searchPanel.add(btnSearch);
-        searchPanel.add(btnRefresh);
+        toolbar.add(Box.createHorizontalGlue());
         
-        // ===== TABLE =====
-        JPanel tablePanel = new JPanel();
-        tablePanel.setBackground(ColorTheme.BACKGROUND);
-        tablePanel.setLayout(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        txtSearch = new SearchField("Tìm kiếm khách hàng...", 300);
+        txtSearch.addActionListener(e -> searchCustomers());
+        
+        toolbar.add(txtSearch);
+        return toolbar;
+    }
+    
+    private JPanel createTablePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(new LineBorder(ProfessionalColors.BORDER, 1));
         
         tableModel = new DefaultTableModel(
-            new String[]{"ID", "Tên Khách Hàng", "Điện Thoại", "Email", "Địa Chỉ"},
-            0
-        ) { 
-            public boolean isCellEditable(int r, int c) { return false; } 
+            new String[]{"ID", "Tên KH", "Điện Thoại", "Email", "Địa Chỉ"}, 0
+        ) {
+            public boolean isCellEditable(int r, int c) { return false; }
         };
         
-        tableCustomers = new JTable(tableModel);
-        tableCustomers.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tableCustomers.setRowHeight(28);
-        tableCustomers.setSelectionBackground(ColorTheme.SUCCESS);
-        tableCustomers.setSelectionForeground(Color.WHITE);
-        tableCustomers.setGridColor(ColorTheme.BORDER);
+        tableCustomers = new ModernTable(tableModel);
+        tableCustomers.setRowHeight(40);
+        tableCustomers.setShowVerticalLines(false);
+        tableCustomers.setSelectionBackground(ProfessionalColors.TABLE_SELECTED);
+        tableCustomers.getTableHeader().setBackground(ProfessionalColors.TABLE_HEADER);
+        tableCustomers.getTableHeader().setForeground(ProfessionalColors.TEXT_PRIMARY);
         
-        JTableHeader header = tableCustomers.getTableHeader();
-        header.setBackground(ColorTheme.SECONDARY);
-        header.setForeground(Color.WHITE);
-        header.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        header.setPreferredSize(new Dimension(0, 35));
+        tableCustomers.getColumnModel().getColumn(0).setPreferredWidth(60);
+        tableCustomers.getColumnModel().getColumn(0).setMaxWidth(80);
+        
+        tableCustomers.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int row = tableCustomers.getSelectedRow();
+                selectedCustomerId = row != -1 ? (int) tableModel.getValueAt(row, 0) : -1;
+            }
+        });
         
         JScrollPane scrollPane = new JScrollPane(tableCustomers);
-        scrollPane.setBorder(BorderFactory.createLineBorder(ColorTheme.BORDER, 1));
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        panel.add(scrollPane, BorderLayout.CENTER);
+        return panel;
+    }
+    
+    private JPanel createStatusBar() {
+        JPanel statusBar = new JPanel(new BorderLayout());
+        statusBar.setBackground(Color.WHITE);
+        statusBar.setBorder(new CompoundBorder(
+            new MatteBorder(1, 0, 0, 0, ProfessionalColors.BORDER),
+            new EmptyBorder(6, 20, 6, 20)
+        ));
         
-        // ===== ACTIONS =====
-        JPanel actionPanel = new JPanel();
-        actionPanel.setBackground(ColorTheme.SURFACE);
-        actionPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 15));
-        actionPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 20));
+        lblStatus = new JLabel("Sẵn sàng");
+        lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblStatus.setForeground(ProfessionalColors.TEXT_SECONDARY);
         
-        ModernButton btnAdd = new ModernButton("➕ Thêm", ColorTheme.SUCCESS);
-        btnAdd.setPreferredSize(new Dimension(110, 40));
-        
-        ModernButton btnEdit = new ModernButton("✏️ Sửa", ColorTheme.INFO);
-        btnEdit.setPreferredSize(new Dimension(100, 40));
-        
-        ModernButton btnDelete = new ModernButton("🗑️ Xóa", ColorTheme.DANGER);
-        btnDelete.setPreferredSize(new Dimension(100, 40));
-        
-        actionPanel.add(btnAdd);
-        actionPanel.add(btnEdit);
-        actionPanel.add(btnDelete);
-        
-        // ===== MAIN =====
-        JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(ColorTheme.BACKGROUND);
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(searchPanel, BorderLayout.NORTH);
-        mainPanel.add(tablePanel, BorderLayout.CENTER);
-        mainPanel.add(actionPanel, BorderLayout.SOUTH);
-        
-        add(headerPanel, BorderLayout.NORTH);
-        add(mainPanel, BorderLayout.CENTER);
-        
-        // ===== EVENTS =====
-        btnBack.addActionListener(e -> dispose());
-        btnSearch.addActionListener(e -> searchCustomers());
-        btnRefresh.addActionListener(e -> loadData());
-        btnAdd.addActionListener(e -> handleAction("CREATE"));
-        btnEdit.addActionListener(e -> handleAction("UPDATE"));
-        btnDelete.addActionListener(e -> handleAction("DELETE"));
+        statusBar.add(lblStatus, BorderLayout.WEST);
+        return statusBar;
     }
     
     private void loadData() {
         tableModel.setRowCount(0);
-        String query = "SELECT CustomerID, CustomerName, Phone, Email, Address FROM Customers";
+        String query = "SELECT CustomerID, CustomerName, Phone, Email, Address FROM Customers ORDER BY CustomerID DESC";
         
         try (Connection conn = DatabaseHelper.getDBConnection();
              Statement stmt = conn.createStatement();
@@ -162,37 +170,173 @@ public class FormQuanLyKhachHang extends JFrame {
                     rs.getString("Address")
                 });
             }
-            lblTotalCount.setText("Tổng: " + tableModel.getRowCount() + " khách hàng");
+            lblStatus.setText(tableModel.getRowCount() + " khách hàng");
         } catch (SQLException e) { e.printStackTrace(); }
     }
     
     private void searchCustomers() {
         String keyword = txtSearch.getText().trim();
-        tableModel.setRowCount(0);
+        if (keyword.isEmpty()) { loadData(); return; }
         
-        String query = "SELECT CustomerID, CustomerName, Phone, Email, Address FROM Customers " +
-                       "WHERE CustomerName LIKE ? OR Phone LIKE ?";
+        tableModel.setRowCount(0);
+        String query = "SELECT CustomerID, CustomerName, Phone, Email, Address FROM Customers WHERE CustomerName LIKE ? OR Phone LIKE ?";
         
         try (Connection conn = DatabaseHelper.getDBConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(query)) {
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, "%" + keyword + "%");
             pstmt.setString(2, "%" + keyword + "%");
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 tableModel.addRow(new Object[]{
-                    rs.getInt("CustomerID"),
-                    rs.getString("CustomerName"),
-                    rs.getString("Phone"),
-                    rs.getString("Email"),
-                    rs.getString("Address")
+                    rs.getInt("CustomerID"), rs.getString("CustomerName"),
+                    rs.getString("Phone"), rs.getString("Email"), rs.getString("Address")
                 });
             }
-            lblTotalCount.setText("Tìm thấy: " + tableModel.getRowCount() + " khách hàng");
+            lblStatus.setText("Tìm thấy " + tableModel.getRowCount() + " khách hàng");
         } catch (SQLException e) { e.printStackTrace(); }
     }
     
-    private void handleAction(String action) {
-        // Action is handled
+    private void showAddDialog() {
+        JDialog dialog = new JDialog(this, "Thêm Khách Hàng", true);
+        dialog.setSize(500, 350);
+        dialog.setLocationRelativeTo(this);
+        
+        JTextField txtName = new JTextField();
+        JTextField txtPhone = new JTextField();
+        JTextField txtEmail = new JTextField();
+        JTextArea txtAddress = new JTextArea(3, 20);
+        txtAddress.setLineWrap(true);
+        
+        JPanel form = new JPanel();
+        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+        form.setBorder(new EmptyBorder(16, 16, 16, 16));
+        form.setBackground(Color.WHITE);
+        
+        form.add(createFormRow("Tên KH:", txtName));
+        form.add(Box.createVerticalStrut(12));
+        form.add(createFormRow("Điện Thoại:", txtPhone));
+        form.add(Box.createVerticalStrut(12));
+        form.add(createFormRow("Email:", txtEmail));
+        form.add(Box.createVerticalStrut(12));
+        form.add(createFormRow("Địa Chỉ:", new JScrollPane(txtAddress)));
+        
+        JPanel buttonBar = createDialogButtons(dialog, () -> {
+            if (txtName.getText().trim().isEmpty() || txtPhone.getText().trim().isEmpty()) {
+                ToastNotification.show(dialog, "Vui lòng nhập tên và SĐT!", ToastNotification.WARNING);
+                return;
+            }
+            
+            String query = "INSERT INTO Customers (CustomerName, Phone, Email, Address) VALUES (?, ?, ?, ?)";
+            if (DatabaseHelper.executeUpdate(query, txtName.getText().trim(), txtPhone.getText().trim(),
+                txtEmail.getText().trim(), txtAddress.getText().trim())) {
+                ToastNotification.show(this, "✅ Thêm thành công!", ToastNotification.SUCCESS);
+                dialog.dispose();
+                loadData();
+            }
+        });
+        
+        dialog.add(form, BorderLayout.CENTER);
+        dialog.add(buttonBar, BorderLayout.SOUTH);
+        dialog.setVisible(true);
+    }
+    
+    private void showEditDialog() {
+        if (selectedCustomerId == -1) {
+            ToastNotification.show(this, "Vui lòng chọn khách hàng!", ToastNotification.WARNING);
+            return;
+        }
+        
+        String query = "SELECT CustomerName, Phone, Email, Address FROM Customers WHERE CustomerID = ?";
+        try (Connection conn = DatabaseHelper.getDBConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, selectedCustomerId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                JDialog dialog = new JDialog(this, "Sửa Khách Hàng", true);
+                dialog.setSize(500, 350);
+                dialog.setLocationRelativeTo(this);
+                
+                JTextField txtName = new JTextField(rs.getString("CustomerName"));
+                JTextField txtPhone = new JTextField(rs.getString("Phone"));
+                JTextField txtEmail = new JTextField(rs.getString("Email"));
+                JTextArea txtAddress = new JTextArea(rs.getString("Address"), 3, 20);
+                txtAddress.setLineWrap(true);
+                
+                JPanel form = new JPanel();
+                form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+                form.setBorder(new EmptyBorder(16, 16, 16, 16));
+                form.setBackground(Color.WHITE);
+                
+                form.add(createFormRow("Tên KH:", txtName));
+                form.add(Box.createVerticalStrut(12));
+                form.add(createFormRow("Điện Thoại:", txtPhone));
+                form.add(Box.createVerticalStrut(12));
+                form.add(createFormRow("Email:", txtEmail));
+                form.add(Box.createVerticalStrut(12));
+                form.add(createFormRow("Địa Chỉ:", new JScrollPane(txtAddress)));
+                
+                JPanel buttonBar = createDialogButtons(dialog, () -> {
+                    String updateQuery = "UPDATE Customers SET CustomerName = ?, Phone = ?, Email = ?, Address = ? WHERE CustomerID = ?";
+                    if (DatabaseHelper.executeUpdate(updateQuery, txtName.getText().trim(), txtPhone.getText().trim(),
+                        txtEmail.getText().trim(), txtAddress.getText().trim(), selectedCustomerId)) {
+                        ToastNotification.show(this, "✅ Cập nhật thành công!", ToastNotification.SUCCESS);
+                        dialog.dispose();
+                        loadData();
+                    }
+                });
+                
+                dialog.add(form, BorderLayout.CENTER);
+                dialog.add(buttonBar, BorderLayout.SOUTH);
+                dialog.setVisible(true);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+    
+    private void deleteCustomer() {
+        if (selectedCustomerId == -1) {
+            ToastNotification.show(this, "Vui lòng chọn khách hàng!", ToastNotification.WARNING);
+            return;
+        }
+        
+        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận xóa?", "Xóa KH", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (DatabaseHelper.executeUpdate("DELETE FROM Customers WHERE CustomerID = ?", selectedCustomerId)) {
+                ToastNotification.show(this, "✅ Xóa thành công!", ToastNotification.SUCCESS);
+                selectedCustomerId = -1;
+                loadData();
+            }
+        }
+    }
+    
+    private JPanel createFormRow(String label, JComponent field) {
+        JPanel row = new JPanel(new BorderLayout(12, 0));
+        row.setBackground(Color.WHITE);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, field instanceof JScrollPane ? 80 : 32));
+        
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lbl.setPreferredSize(new Dimension(100, 32));
+        
+        field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        row.add(lbl, BorderLayout.WEST);
+        row.add(field, BorderLayout.CENTER);
+        return row;
+    }
+    
+    private JPanel createDialogButtons(JDialog dialog, Runnable onSave) {
+        JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 12));
+        buttonBar.setBackground(ProfessionalColors.BACKGROUND);
+        buttonBar.setBorder(new MatteBorder(1, 0, 0, 0, ProfessionalColors.BORDER));
+        
+        ToolbarButton btnCancel = new ToolbarButton("Hủy", ProfessionalColors.TEXT_SECONDARY);
+        btnCancel.addActionListener(e -> dialog.dispose());
+        
+        ToolbarButton btnSave = new ToolbarButton("Lưu", ProfessionalColors.SUCCESS);
+        btnSave.addActionListener(e -> onSave.run());
+        
+        buttonBar.add(btnCancel);
+        buttonBar.add(btnSave);
+        return buttonBar;
     }
 }
-
