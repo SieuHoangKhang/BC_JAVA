@@ -67,39 +67,14 @@ public class FormDangNhap extends JFrame {
         gradientPanel.setLayout(new BoxLayout(gradientPanel, BoxLayout.Y_AXIS));
         gradientPanel.setBorder(new EmptyBorder(60, 50, 60, 50));
         
-        // Title
-        JLabel lblTitle = new JLabel("NỘI THẤT");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 42));
-        lblTitle.setForeground(ElegantTheme.CLASSIC_WHITE);
+        // Title - Main branding
+        JLabel lblTitle = new JLabel("Quản Lí Nội Thất");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        lblTitle.setForeground(new Color(184, 134, 11)); // Màu vàng đồng như hình mẫu
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        // Subtitle
-        JLabel lblSubtitle = new JLabel("Cửa Hàng Nội Thất Cao Cấp");
-        lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        lblSubtitle.setForeground(new Color(255, 255, 255, 200));
-        lblSubtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        // Decorative line
-        JSeparator separator = new JSeparator();
-        separator.setMaximumSize(new Dimension(100, 2));
-        separator.setForeground(ElegantTheme.CLASSIC_WHITE);
-        separator.setBackground(ElegantTheme.CLASSIC_WHITE);
-        separator.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        // Tagline
-        JLabel lblTagline = new JLabel("Hệ thống quản lý chuyên nghiệp");
-        lblTagline.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-        lblTagline.setForeground(new Color(255, 255, 255, 180));
-        lblTagline.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         gradientPanel.add(Box.createVerticalGlue());
         gradientPanel.add(lblTitle);
-        gradientPanel.add(Box.createVerticalStrut(12));
-        gradientPanel.add(separator);
-        gradientPanel.add(Box.createVerticalStrut(12));
-        gradientPanel.add(lblSubtitle);
-        gradientPanel.add(Box.createVerticalStrut(8));
-        gradientPanel.add(lblTagline);
         gradientPanel.add(Box.createVerticalGlue());
         
         panel.add(gradientPanel, BorderLayout.CENTER);

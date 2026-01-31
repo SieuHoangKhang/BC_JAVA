@@ -59,12 +59,12 @@ public class ManHinhChinh extends JFrame {
         logoPanel.setOpaque(false);
         logoPanel.setMaximumSize(new Dimension(250, 70));
         
-        JLabel lblLogo = new JLabel("NỘI THẤT");
+        JLabel lblLogo = new JLabel("QUẢN LÍ NỘI THẤT");
         lblLogo.setFont(FontHelper.h3());
         lblLogo.setForeground(ElegantTheme.PRIMARY);
         logoPanel.add(lblLogo);
         
-        JLabel lblSubtitle = new JLabel("Nội Thất Cao Cấp");
+        JLabel lblSubtitle = new JLabel("Quản Lí Nội Thất");
         lblSubtitle.setFont(FontHelper.bodySmall());
         lblSubtitle.setForeground(ElegantTheme.TEXT_SECONDARY);
         logoPanel.add(lblSubtitle);
