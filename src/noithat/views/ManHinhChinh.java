@@ -81,13 +81,13 @@ public class ManHinhChinh extends JFrame {
         sidebarPanel.add(Box.createVerticalStrut(12));
         
         // Menu items with proper interaction - CLICK TO OPEN FORMS
-        addMenuItem("📦", "Sản Phẩm", () -> openForm(new FormQuanLySanPham()));
-        addMenuItem("🛒", "Đơn Hàng", () -> openForm(new FormQuanLyDonHang()));
-        addMenuItem("👥", "Khách Hàng", () -> openForm(new FormQuanLyKhachHang()));
-        addMenuItem("🏭", "Kho Hàng", () -> openForm(new FormQuanLyKho()));
-        addMenuItem("📁", "Danh Mục", () -> openForm(new FormQuanLyDanhMuc()));
-        addMenuItem("🚚", "Nhà Cung Cấp", () -> openForm(new FormQuanLyNhaCungCap()));
-        addMenuItem("📊", "Báo Cáo", () -> openForm(new FormBaoCao()));
+        addMenuItem("Sản Phẩm", () -> openForm(new FormQuanLySanPham()));
+        addMenuItem("Đơn Hàng", () -> openForm(new FormQuanLyDonHang()));
+        addMenuItem("Khách Hàng", () -> openForm(new FormQuanLyKhachHang()));
+        addMenuItem("Kho Hàng", () -> openForm(new FormQuanLyKho()));
+        addMenuItem("Danh Mục", () -> openForm(new FormQuanLyDanhMuc()));
+        addMenuItem("Nhà Cung Cấp", () -> openForm(new FormQuanLyNhaCungCap()));
+        addMenuItem("Báo Cáo", () -> openForm(new FormBaoCao()));
         
         sidebarPanel.add(Box.createVerticalGlue());
         
@@ -145,23 +145,17 @@ public class ManHinhChinh extends JFrame {
         sidebarPanel.add(Box.createVerticalStrut(10));
     }
     
-    private void addMenuItem(String icon, String text, Runnable action) {
+    private void addMenuItem(String text, Runnable action) {
         JPanel menuItem = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 10));
         menuItem.setOpaque(false);
         menuItem.setMaximumSize(new Dimension(250, 52));
         menuItem.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Icon
-        JLabel lblIcon = new JLabel(icon);
-        lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        lblIcon.setPreferredSize(new Dimension(28, 28));
-        
-        // Text
+        // Text only
         JLabel lblText = new JLabel(text);
         lblText.setFont(FontHelper.bodyMedium());
         lblText.setForeground(ElegantTheme.TEXT_PRIMARY);
         
-        menuItem.add(lblIcon);
         menuItem.add(lblText);
         
         menuItem.addMouseListener(new MouseAdapter() {
@@ -288,33 +282,30 @@ public class ManHinhChinh extends JFrame {
         chartPanel.setBackground(ElegantTheme.SURFACE);
         chartPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        JLabel lblChartTitle = new JLabel("📈 DOANH THU THEO THÁNG");
+        JLabel lblChartTitle = new JLabel("DOANH THU THEO THÁNG");
         lblChartTitle.setFont(FontHelper.h4());
         lblChartTitle.setForeground(ElegantTheme.TEXT_PRIMARY);
         chartPanel.add(lblChartTitle, BorderLayout.NORTH);
         
-        // Chart area with simple bars
-        JPanel chartArea = new JPanel();
-        chartArea.setLayout(new BoxLayout(chartArea, BoxLayout.Y_AXIS));
-        chartArea.setOpaque(false);
-        chartArea.setBorder(new EmptyBorder(20, 10, 10, 10));
+        // Chart area with 12 months and horizontal scroll
+        String[] months = {"T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"};
+        int[] revenues = {120, 150, 180, 140, 200, 220, 180, 250, 210, 190, 230, 280};
+        int maxRevenue = 300;
         
-        String[] months = {"T1", "T2", "T3", "T4", "T5", "T6"};
-        int[] revenues = {120, 150, 180, 140, 200, 220};
-        int maxRevenue = 250;
-        
-        JPanel barsPanel = new JPanel(new GridLayout(1, 6, 8, 0));
+        JPanel barsPanel = new JPanel(new GridLayout(1, 12, 8, 0));
         barsPanel.setOpaque(false);
+        barsPanel.setBackground(ElegantTheme.SURFACE);
         
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 12; i++) {
             JPanel barContainer = new JPanel(new BorderLayout(0, 5));
             barContainer.setOpaque(false);
+            barContainer.setBackground(ElegantTheme.SURFACE);
             
-            int height = (revenues[i] * 150) / maxRevenue;
+            int height = (revenues[i] * 120) / maxRevenue;
             JPanel bar = new JPanel();
-            bar.setPreferredSize(new Dimension(40, height));
+            bar.setPreferredSize(new Dimension(35, height));
             bar.setBackground(ElegantTheme.PRIMARY);
-            bar.setMaximumSize(new Dimension(50, 150));
+            bar.setMaximumSize(new Dimension(50, 120));
             
             JLabel lblValue = new JLabel(String.valueOf(revenues[i]));
             lblValue.setFont(FontHelper.bodySmall());
@@ -333,15 +324,24 @@ public class ManHinhChinh extends JFrame {
             barsPanel.add(barContainer);
         }
         
-        chartArea.add(barsPanel);
-        chartPanel.add(chartArea, BorderLayout.CENTER);
+        // Wrap in scroll pane for horizontal scrolling
+        JScrollPane chartScrollPane = new JScrollPane(barsPanel);
+        chartScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        chartScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        chartScrollPane.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+        chartScrollPane.setOpaque(false);
+        chartScrollPane.getViewport().setOpaque(false);
+        chartScrollPane.setBackground(ElegantTheme.SURFACE);
+        chartScrollPane.setPreferredSize(new Dimension(350, 200));
+        
+        chartPanel.add(chartScrollPane, BorderLayout.CENTER);
         
         // Right: Recent Orders
         JPanel ordersPanel = new JPanel(new BorderLayout());
         ordersPanel.setBackground(ElegantTheme.SURFACE);
         ordersPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        JLabel lblOrdersTitle = new JLabel("🛒 ĐƠN HÀNG MỚI NHẤT");
+        JLabel lblOrdersTitle = new JLabel("ĐƠN HÀNG MỚI NHẤT");
         lblOrdersTitle.setFont(FontHelper.h4());
         lblOrdersTitle.setForeground(ElegantTheme.TEXT_PRIMARY);
         ordersPanel.add(lblOrdersTitle, BorderLayout.NORTH);

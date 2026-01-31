@@ -12,7 +12,7 @@ public class FormQuanLyNhaCungCap extends JFrame {
     private ModernTable tableSuppliers;
     private DefaultTableModel tableModel;
     private SearchField txtSearch;
-    private ToolbarButton btnAdd, btnEdit, btnDelete;
+    private ToolbarButton btnAdd, btnEdit, btnDelete, btnReload;
     private JLabel lblStatus;
     private int selectedSupplierId = -1;
     
@@ -76,7 +76,7 @@ public class FormQuanLyNhaCungCap extends JFrame {
             new EmptyBorder(4, 16, 4, 16)
         ));
         
-        ToolbarButton btnBack = new ToolbarButton("← Quay Lại", ProfessionalColors.DANGER);
+        ToolbarButton btnBack = new ToolbarButton("Quay Lai", ProfessionalColors.DANGER);
         btnBack.setPreferredSize(new Dimension(120, 36));
         btnBack.addActionListener(e -> dispose());
         
@@ -89,11 +89,17 @@ public class FormQuanLyNhaCungCap extends JFrame {
         btnDelete = new ToolbarButton("Xóa", ProfessionalColors.DANGER);
         btnDelete.addActionListener(e -> deleteSupplier());
         
+        btnReload = new ToolbarButton("Làm Mới", ProfessionalColors.INFO);
+        btnReload.setPreferredSize(new Dimension(120, 36));
+        btnReload.addActionListener(e -> reloadData());
+        
         toolbar.add(btnBack);
         toolbar.add(Box.createHorizontalStrut(12));
         toolbar.add(btnAdd);
         toolbar.add(btnEdit);
         toolbar.add(btnDelete);
+        toolbar.add(Box.createHorizontalStrut(8));
+        toolbar.add(btnReload);
         
         toolbar.add(Box.createHorizontalGlue());
         
@@ -174,6 +180,14 @@ public class FormQuanLyNhaCungCap extends JFrame {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    
+    private void reloadData() {
+        txtSearch.setText("");
+        loadData();
+        selectedSupplierId = -1;
+        tableSuppliers.clearSelection();
+        ToastNotification.show(this, "Đã làm mới dữ liệu!", ToastNotification.SUCCESS);
     }
     
     private void searchSuppliers() {

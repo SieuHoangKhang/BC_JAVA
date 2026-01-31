@@ -33,7 +33,7 @@ public class FormBaoCao extends JFrame {
         headerPanel.setLayout(new BorderLayout());
         headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         
-        JLabel lblTitle = new JLabel("📊 BÁO CÁO & THỐNG KÊ");
+        JLabel lblTitle = new JLabel("BÁO CÁO & THỐNG KÊ");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(Color.WHITE);
         
@@ -41,7 +41,7 @@ public class FormBaoCao extends JFrame {
         lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblStatus.setForeground(Color.WHITE);
         
-        btnBack = new ModernButton("← Quay Lại", ColorTheme.DANGER);
+        btnBack = new ModernButton("Quay Lai", ColorTheme.DANGER);
         btnBack.setPreferredSize(new Dimension(140, 45));
         btnBack.addActionListener(e -> this.dispose());
         
@@ -60,7 +60,7 @@ public class FormBaoCao extends JFrame {
         controlPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 20));
         controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 15));
         
-        JLabel lblReportType = new JLabel("🔍 Loại Báo Cáo:");
+        JLabel lblReportType = new JLabel("Loại Báo Cáo:");
         lblReportType.setFont(new Font("Segoe UI", Font.BOLD, 12));
         cmbReportType = new JComboBox<>(new String[]{
             "Doanh Thu Bán Hàng",
@@ -71,11 +71,11 @@ public class FormBaoCao extends JFrame {
         cmbReportType.setPreferredSize(new Dimension(220, 40));
         cmbReportType.addActionListener(e -> loadData());
         
-        btnRefresh = new ModernButton("🔄 Làm mới", ColorTheme.SUCCESS);
+        btnRefresh = new ModernButton("Lam Moi", ColorTheme.SUCCESS);
         btnRefresh.setPreferredSize(new Dimension(120, 40));
         btnRefresh.addActionListener(e -> loadData());
         
-        btnExport = new ModernButton("📊 Xuất Excel/CSV", ColorTheme.INFO);
+        btnExport = new ModernButton("Xuat Excel/CSV", ColorTheme.INFO);
         btnExport.setPreferredSize(new Dimension(150, 40));
         btnExport.addActionListener(e -> exportToCSV());
         

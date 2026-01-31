@@ -13,7 +13,7 @@ public class FormQuanLyDonHang extends JFrame {
     private ModernTable tableOrders;
     private DefaultTableModel tableModel;
     private SearchField txtSearch;
-    private ToolbarButton btnAdd, btnView, btnEdit, btnDelete;
+    private ToolbarButton btnAdd, btnView, btnEdit, btnDelete, btnReload;
     private JLabel lblStatus;
     private int selectedOrderId = -1;
     
@@ -77,7 +77,7 @@ public class FormQuanLyDonHang extends JFrame {
             new EmptyBorder(4, 16, 4, 16)
         ));
         
-        ToolbarButton btnBack = new ToolbarButton("← Quay Lại", ProfessionalColors.DANGER);
+        ToolbarButton btnBack = new ToolbarButton("Quay Lai", ProfessionalColors.DANGER);
         btnBack.setPreferredSize(new Dimension(120, 36));
         btnBack.addActionListener(e -> dispose());
         
@@ -93,12 +93,18 @@ public class FormQuanLyDonHang extends JFrame {
         btnDelete = new ToolbarButton("Xóa", ProfessionalColors.DANGER);
         btnDelete.addActionListener(e -> deleteOrder());
         
+        btnReload = new ToolbarButton("Làm Mới", ProfessionalColors.INFO);
+        btnReload.setPreferredSize(new Dimension(120, 36));
+        btnReload.addActionListener(e -> reloadData());
+        
         toolbar.add(btnBack);
         toolbar.add(Box.createHorizontalStrut(12));
         toolbar.add(btnAdd);
         toolbar.add(btnEdit);
         toolbar.add(btnView);
         toolbar.add(btnDelete);
+        toolbar.add(Box.createHorizontalStrut(8));
+        toolbar.add(btnReload);
         
         toolbar.add(Box.createHorizontalGlue());
         
@@ -182,6 +188,14 @@ public class FormQuanLyDonHang extends JFrame {
             }
             lblStatus.setText(tableModel.getRowCount() + " đơn hàng");
         } catch (SQLException e) { e.printStackTrace(); }
+    }
+    
+    private void reloadData() {
+        txtSearch.setText("");
+        loadData();
+        selectedOrderId = -1;
+        tableOrders.clearSelection();
+        ToastNotification.show(this, "Đã làm mới dữ liệu!", ToastNotification.SUCCESS);
     }
     
     private void searchOrders() {

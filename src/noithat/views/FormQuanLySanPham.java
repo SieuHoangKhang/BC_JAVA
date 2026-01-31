@@ -12,7 +12,7 @@ public class FormQuanLySanPham extends JFrame {
     private ModernTable tblProducts;
     private DefaultTableModel tableModel;
     private SearchField txtSearch;
-    private ToolbarButton btnAdd, btnEdit, btnDelete;
+    private ToolbarButton btnAdd, btnEdit, btnDelete, btnReload;
     private JLabel lblStatus;
     private int selectedProductId = -1;
     
@@ -76,7 +76,7 @@ public class FormQuanLySanPham extends JFrame {
             new EmptyBorder(4, 16, 4, 16)
         ));
         
-        ToolbarButton btnBack = new ToolbarButton("← Quay Lại", ProfessionalColors.DANGER);
+        ToolbarButton btnBack = new ToolbarButton("Quay Lai", ProfessionalColors.DANGER);
         btnBack.setPreferredSize(new Dimension(120, 36));
         btnBack.addActionListener(e -> dispose());
         
@@ -89,11 +89,16 @@ public class FormQuanLySanPham extends JFrame {
         btnDelete = new ToolbarButton("Xóa", ProfessionalColors.DANGER);
         btnDelete.addActionListener(e -> deleteProduct());
         
+        btnReload = new ToolbarButton("Làm Mới", ProfessionalColors.INFO);
+        btnReload.setPreferredSize(new Dimension(120, 36));
+        btnReload.addActionListener(e -> reloadData());
+        
         toolbar.add(btnBack);
         toolbar.add(Box.createHorizontalStrut(12));
         toolbar.add(btnAdd);
         toolbar.add(btnEdit);
         toolbar.add(btnDelete);
+        toolbar.add(btnReload);
         
         toolbar.add(Box.createHorizontalGlue());
         
@@ -181,20 +186,44 @@ public class FormQuanLySanPham extends JFrame {
         }
     }
     
+    /**
+     * Làm mới dữ liệu - xóa tìm kiếm và load lại toàn bộ
+     */
+    private void reloadData() {
+        // Xóa nội dung tìm kiếm
+        txtSearch.setText("");
+        
+        // Load lại toàn bộ dữ liệu
+        loadData();
+        
+        // Reset selection
+        selectedProductId = -1;
+        tblProducts.clearSelection();
+        
+        // Hiện thông báo
+        ToastNotification.show(this, "Đã làm mới dữ liệu!", ToastNotification.SUCCESS);
+    }
+    
     private void searchProducts() {
         String keyword = txtSearch.getText().trim();
-        if (keyword.isEmpty()) { loadData(); return; }
+        
+        // Nếu không có từ khóa, load lại toàn bộ dữ liệu
+        if (keyword.isEmpty()) {
+            loadData();
+            return;
+        }
         
         tableModel.setRowCount(0);
         String query = "SELECT p.ProductID, p.ProductName, c.CategoryName, p.Price, p.Stock, s.SupplierName " +
                        "FROM Products p " +
                        "LEFT JOIN Categories c ON p.CategoryID = c.CategoryID " +
                        "LEFT JOIN Suppliers s ON p.SupplierID = s.SupplierID " +
-                       "WHERE p.ProductName LIKE ?";
+                       "WHERE p.ProductName LIKE ? OR p.Description LIKE ?";
         
         try (Connection conn = DatabaseHelper.getDBConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, "%" + keyword + "%");
+            pstmt.setString(2, "%" + keyword + "%");
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 tableModel.addRow(new Object[]{

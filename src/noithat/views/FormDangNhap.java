@@ -2,6 +2,7 @@ package noithat.views;
 
 import noithat.database.DatabaseHelper;
 import noithat.utils.*;
+import noithat.utils.ElegantTheme;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -20,15 +21,15 @@ public class FormDangNhap extends JFrame {
     }
     
     private void initComponents() {
-        setTitle("Hệ Thống Quản Lý Nội Thất");
+        setTitle("He Thong Quan Ly Cua Hang Noi That");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 600);
+        setSize(900, 550);
         setLocationRelativeTo(null);
         setResizable(false);
         
         // MAIN LAYOUT - Split screen design
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(ElegantTheme.CLASSIC_WHITE);
         
         // LEFT SIDE - Branding
         JPanel leftPanel = createBrandingPanel();
@@ -43,28 +44,65 @@ public class FormDangNhap extends JFrame {
     }
     
     private JPanel createBrandingPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(ProfessionalColors.PRIMARY);
-        panel.setBorder(new EmptyBorder(80, 60, 80, 60));
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(ElegantTheme.PRIMARY);
+        
+        // Gradient overlay for sophistication
+        JPanel gradientPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                Color color1 = ElegantTheme.PRIMARY;
+                Color color2 = ElegantTheme.PRIMARY_HOVER;
+                
+                GradientPaint gradient = new GradientPaint(0, 0, color1, getWidth(), getHeight(), color2);
+                g2.setPaint(gradient);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.dispose();
+            }
+        };
+        gradientPanel.setLayout(new BoxLayout(gradientPanel, BoxLayout.Y_AXIS));
+        gradientPanel.setBorder(new EmptyBorder(60, 50, 60, 50));
         
         // Title
-        JLabel lblTitle = new JLabel("Quản Lý Nội Thất");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 36));
-        lblTitle.setForeground(Color.WHITE);
+        JLabel lblTitle = new JLabel("NỘI THẤT");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 42));
+        lblTitle.setForeground(ElegantTheme.CLASSIC_WHITE);
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Subtitle
-        JLabel lblSubtitle = new JLabel("Hệ thống quản lý hiện đại & chuyên nghiệp");
-        lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        JLabel lblSubtitle = new JLabel("Cửa Hàng Nội Thất Cao Cấp");
+        lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         lblSubtitle.setForeground(new Color(255, 255, 255, 200));
         lblSubtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        panel.add(Box.createVerticalGlue());
-        panel.add(lblTitle);
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(lblSubtitle);
-        panel.add(Box.createVerticalGlue());
+        // Decorative line
+        JSeparator separator = new JSeparator();
+        separator.setMaximumSize(new Dimension(100, 2));
+        separator.setForeground(ElegantTheme.CLASSIC_WHITE);
+        separator.setBackground(ElegantTheme.CLASSIC_WHITE);
+        separator.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Tagline
+        JLabel lblTagline = new JLabel("Hệ thống quản lý chuyên nghiệp");
+        lblTagline.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+        lblTagline.setForeground(new Color(255, 255, 255, 180));
+        lblTagline.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        gradientPanel.add(Box.createVerticalGlue());
+        gradientPanel.add(lblTitle);
+        gradientPanel.add(Box.createVerticalStrut(12));
+        gradientPanel.add(separator);
+        gradientPanel.add(Box.createVerticalStrut(12));
+        gradientPanel.add(lblSubtitle);
+        gradientPanel.add(Box.createVerticalStrut(8));
+        gradientPanel.add(lblTagline);
+        gradientPanel.add(Box.createVerticalGlue());
+        
+        panel.add(gradientPanel, BorderLayout.CENTER);
         
         return panel;
     }
@@ -72,25 +110,25 @@ public class FormDangNhap extends JFrame {
     private JPanel createLoginPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new EmptyBorder(80, 50, 80, 50));
-        panel.setPreferredSize(new Dimension(420, 600));
+        panel.setBackground(ElegantTheme.SURFACE);
+        panel.setBorder(new EmptyBorder(60, 50, 60, 50));
+        panel.setPreferredSize(new Dimension(400, 550));
         
         // Welcome text
         JLabel lblWelcome = new JLabel("Đăng Nhập");
         lblWelcome.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        lblWelcome.setForeground(ProfessionalColors.TEXT_PRIMARY);
+        lblWelcome.setForeground(ElegantTheme.TEXT_PRIMARY);
         lblWelcome.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         JLabel lblWelcomeSub = new JLabel("Vui lòng nhập thông tin đăng nhập");
         lblWelcomeSub.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblWelcomeSub.setForeground(ProfessionalColors.TEXT_SECONDARY);
+        lblWelcomeSub.setForeground(ElegantTheme.TEXT_SECONDARY);
         lblWelcomeSub.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         // Username field
         JLabel lblUsername = new JLabel("Tên đăng nhập");
         lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblUsername.setForeground(ProfessionalColors.TEXT_PRIMARY);
+        lblUsername.setForeground(ElegantTheme.TEXT_PRIMARY);
         lblUsername.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         txtUsername = new JTextField();
@@ -98,15 +136,15 @@ public class FormDangNhap extends JFrame {
         txtUsername.setPreferredSize(new Dimension(320, 42));
         txtUsername.setMaximumSize(new Dimension(320, 42));
         txtUsername.setBorder(new CompoundBorder(
-            new LineBorder(ProfessionalColors.BORDER, 1, true),
-            new EmptyBorder(8, 12, 8, 12)
+            new LineBorder(ElegantTheme.NEUTRAL_200, 1, true),
+            new EmptyBorder(10, 14, 10, 14)
         ));
         txtUsername.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         // Password field
         JLabel lblPassword = new JLabel("Mật khẩu");
         lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblPassword.setForeground(ProfessionalColors.TEXT_PRIMARY);
+        lblPassword.setForeground(ElegantTheme.TEXT_PRIMARY);
         lblPassword.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         txtPassword = new JPasswordField();
@@ -114,19 +152,19 @@ public class FormDangNhap extends JFrame {
         txtPassword.setPreferredSize(new Dimension(320, 42));
         txtPassword.setMaximumSize(new Dimension(320, 42));
         txtPassword.setBorder(new CompoundBorder(
-            new LineBorder(ProfessionalColors.BORDER, 1, true),
-            new EmptyBorder(8, 12, 8, 12)
+            new LineBorder(ElegantTheme.NEUTRAL_200, 1, true),
+            new EmptyBorder(10, 14, 10, 14)
         ));
         txtPassword.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         // Status label
         lblStatus = new JLabel(" ");
         lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblStatus.setForeground(ProfessionalColors.DANGER);
+        lblStatus.setForeground(ElegantTheme.DANGER);
         lblStatus.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         // Login button
-        btnLogin = new ToolbarButton("Đăng Nhập", ProfessionalColors.PRIMARY);
+        btnLogin = new ToolbarButton("Đăng Nhập", ElegantTheme.PRIMARY);
         btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnLogin.setPreferredSize(new Dimension(320, 44));
         btnLogin.setMaximumSize(new Dimension(320, 44));
@@ -136,7 +174,7 @@ public class FormDangNhap extends JFrame {
         // Exit link
         btnExit = new JButton("Thoát ứng dụng");
         btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        btnExit.setForeground(ProfessionalColors.TEXT_SECONDARY);
+        btnExit.setForeground(ElegantTheme.TEXT_TERTIARY);
         btnExit.setBorderPainted(false);
         btnExit.setContentAreaFilled(false);
         btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -147,7 +185,7 @@ public class FormDangNhap extends JFrame {
         panel.add(lblWelcome);
         panel.add(Box.createVerticalStrut(8));
         panel.add(lblWelcomeSub);
-        panel.add(Box.createVerticalStrut(40));
+        panel.add(Box.createVerticalStrut(35));
         
         panel.add(lblUsername);
         panel.add(Box.createVerticalStrut(8));
@@ -189,12 +227,12 @@ public class FormDangNhap extends JFrame {
         String password = new String(txtPassword.getPassword());
         
         if (username.isEmpty() || password.isEmpty()) {
-            lblStatus.setText("⚠️ Vui lòng nhập đầy đủ thông tin!");
+            lblStatus.setText("Lỗi: Vui lòng nhập đầy đủ thông tin!");
             return;
         }
         
-        lblStatus.setText("⏳ Đang đăng nhập...");
-        lblStatus.setForeground(ProfessionalColors.INFO);
+        lblStatus.setText("Đang đăng nhập...");
+        lblStatus.setForeground(ElegantTheme.INFO);
         
         String query = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
         try (Connection conn = DatabaseHelper.getDBConnection();
@@ -211,8 +249,8 @@ public class FormDangNhap extends JFrame {
                 SessionManager.getInstance().setUser(userId, username, fullName, role);
                 ActivityLogger.logLogin(userId, username);
                 
-                lblStatus.setText("✅ Đăng nhập thành công!");
-                lblStatus.setForeground(ProfessionalColors.SUCCESS);
+                lblStatus.setText("Đăng nhập thành công!");
+                lblStatus.setForeground(ElegantTheme.SUCCESS);
                 
                 // Delay to show success message
                 Timer timer = new Timer(500, e -> {
@@ -224,14 +262,14 @@ public class FormDangNhap extends JFrame {
                 timer.start();
                 
             } else {
-                lblStatus.setText("❌ Tên đăng nhập hoặc mật khẩu không đúng!");
-                lblStatus.setForeground(ProfessionalColors.DANGER);
+                lblStatus.setText("Sai tên đăng nhập hoặc mật khẩu!");
+                lblStatus.setForeground(ElegantTheme.DANGER);
                 txtPassword.setText("");
                 txtPassword.requestFocus();
             }
         } catch (SQLException e) {
-            lblStatus.setText("❌ Lỗi kết nối database!");
-            lblStatus.setForeground(ProfessionalColors.DANGER);
+            lblStatus.setText("Lỗi kết nối database!");
+            lblStatus.setForeground(ElegantTheme.DANGER);
             e.printStackTrace();
         }
     }
